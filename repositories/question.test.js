@@ -67,7 +67,7 @@ describe('question repository', () => {
     expect(question).toStrictEqual(testQuestions.find(q => q.id === idToFetch))
   })
 
-  test('should return undefined when a question is not found', async () => {
+  test('should return null when a question is not found', async () => {
     const nonExistentId = faker.datatype.uuid()
     const testQuestions = [
       {
@@ -87,7 +87,7 @@ describe('question repository', () => {
     await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
 
     const noQuestion = await questionRepo.getQuestionById(nonExistentId)
-    expect(noQuestion).toBeUndefined()
+    expect(noQuestion).toBeNull()
   })
 
   test('should add a new question and return it', async () => {
@@ -132,6 +132,9 @@ describe('question repository', () => {
     expect(returnedQuestion).toBeNull()
   })
 
+  // After some consideration I came to the conclusion that this is more of an
+  // integration test, because I included schema validation withing API routes
+  /*
   test('should fail to add a new question with malformed body', async () => {
     await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify([]))
     const testQuestion = {
@@ -145,6 +148,7 @@ describe('question repository', () => {
     expect(returnedQuestion).toBeFalsy()
     expect(returnedQuestion).toBeNull()
   })
+  */
 
   test('should return answers by question id', async () => {
     const idToFetch = faker.datatype.uuid()
@@ -290,6 +294,9 @@ describe('question repository', () => {
     expect(returnedAnswer).toBeNull()
   })
 
+  // After some consideration I came to the conclusion that this is more of an
+  // integration test, because I included schema validation withing API routes
+  /*
   test('should fail to add an answer with malformed body', async () => {
     const malformedAnswer = {
       hello: 'bob',
@@ -317,4 +324,5 @@ describe('question repository', () => {
     expect(await questionRepo.getAnswers(questionId)).toHaveLength(0)
     expect(returnedAnswer).toBeNull()
   })
+  */
 })

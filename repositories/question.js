@@ -17,6 +17,7 @@ const makeQuestionRepository = fileName => {
     const questions = JSON.parse(fileContent)
     const question = questions.find(q => q.id === questionId)
 
+    if (!question) return null
     return question
   }
 
@@ -53,7 +54,7 @@ const makeQuestionRepository = fileName => {
     const question = questions.find(q => q.id === questionId)
     const answer = question.answers.find(a => a.id === answerId)
 
-    return (question && answer) ? answer : null
+    return question && answer ? answer : null
   }
 
   const addAnswer = async (questionId, answer) => {

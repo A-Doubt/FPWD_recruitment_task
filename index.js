@@ -2,6 +2,8 @@ const express = require('express')
 const { urlencoded, json } = require('body-parser')
 const makeRepositories = require('./middleware/repositories')
 const { faker } = require('@faker-js/faker')
+const questionSchema = require('./schemas/questionSchema')
+const answerSchema = require('./schemas/answerSchema')
 
 const STORAGE_FILE_PATH = 'questions.json'
 const PORT = 3000
@@ -46,6 +48,9 @@ async function addQuestion(req, res) {
     answers: req.body.answers
   }
 
+  const { error } = questionSchema.validate(question)
+  if (error) return res.status(400).json('The provided question is invalid.')
+
   const q = await req.repositories.questionRepo.addQuestion(question)
   return res.status(201).json(q)
 }
@@ -64,13 +69,16 @@ async function getAnswerByAnswerId(req, res) {
 }
 
 async function addAnswer(req, res) {
-	const questionId = req.params.questionId
-	const answer = {
-		id: faker.datatype.uuid(),
-		author: req.body.author,
-		summary: req.body.summary
-	}
+  const questionId = req.params.questionId
+  const answer = {
+    id: faker.datatype.uuid(),
+    author: req.body.author,
+    summary: req.body.summary
+  }
 
-	const a = await req.repositories.questionRepo.addAnswer(questionId, answer)
-	return a ? res.status(201).json(a) : res.status(400).json()
+  const { error } = answerSchema.validate(answer)
+  if (error) return res.status(400).json('The provided answer is invalid')
+
+  const a = await req.repositories.questionRepo.addAnswer(questionId, answer)
+  return a ? res.status(201).json(a) : res.status(400).json()
 }
