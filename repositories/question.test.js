@@ -249,15 +249,16 @@ describe('question repository', () => {
         answers: []
       }
     ]
-
     await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
 
     const questionId = testQuestions[0].id
     const returnedAnswer = await questionRepo.addAnswer(questionId, answer)
 
-    expect(await questionRepo.getAnswers(questionId)).toHaveLength(1)
     expect(returnedAnswer).toBeTruthy()
     expect(returnedAnswer).toMatchObject(answer)
+    const answers = await questionRepo.getAnswers(questionId)
+    console.log(answers)
+    expect(answers).toHaveLength(1)
   })
 
   test('should fail to add an answer with duplicate summary', async () => {
@@ -286,6 +287,34 @@ describe('question repository', () => {
     const returnedAnswer = await questionRepo.addAnswer(questionId, answer)
 
     expect(await questionRepo.getAnswers(questionId)).toHaveLength(1)
+    expect(returnedAnswer).toBeNull()
+  })
+
+  test('should fail to add an answer with malformed body', async () => {
+    const malformedAnswer = {
+      hello: 'bob',
+      notAnAnswer: 123
+    }
+    const testQuestions = [
+      {
+        id: faker.datatype.uuid(),
+        summary: 'What is my name?',
+        author: 'Jack London',
+        answers: []
+      },
+      {
+        id: faker.datatype.uuid(),
+        summary: 'Who are you?',
+        author: 'Tim Doods',
+        answers: []
+      }
+    ]
+    await writeFile(TEST_QUESTIONS_FILE_PATH, JSON.stringify(testQuestions))
+
+    const questionId = testQuestions[0].id
+    const returnedAnswer = await questionRepo.addAnswer(questionId, malformedAnswer)
+
+    expect(await questionRepo.getAnswers(questionId)).toHaveLength(0)
     expect(returnedAnswer).toBeNull()
   })
 })
